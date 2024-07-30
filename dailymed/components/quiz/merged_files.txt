@@ -1,0 +1,650 @@
+./FeedbackForm.tsx:
+import React, { useState } from 'react';
+import { User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Textarea } from '@/components/ui/textarea';
+import { useCustomToast } from '@/components/ToasterProvider';
+
+// Custom useMediaQuery hook
+const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false);
+
+  React.useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addListener(listener);
+    return () => media.removeListener(listener);
+  }, [matches, query]);
+
+  return matches;
+};
+
+const FeedbackForm = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const showToast = useCustomToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send the feedback to your backend
+    console.log('Feedback submitted:', feedback);
+    showToast('Feedback submitted successfully!', 'success');
+    setFeedback('');
+    setIsOpen(false);
+  };
+
+  const content = (
+    <>
+      <DialogHeader>
+        <DialogTitle>Feedback Form</DialogTitle>
+        <DialogDescription>
+          We appreciate your feedback. Please let us know your thoughts about the quiz.
+        </DialogDescription>
+      </DialogHeader>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Textarea
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          placeholder="Enter your feedback here..."
+          className="w-full"
+        />
+        <Button type="submit">Send Feedback</Button>
+      </form>
+    </>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline">Send Feedback</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          {content}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="outline">Send Feedback</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Feedback Form</DrawerTitle>
+          <DrawerDescription>
+            We appreciate your feedback. Please let us know your thoughts about the quiz.
+          </DrawerDescription>
+        </DrawerHeader>
+        {content}
+        <DrawerFooter className="pt-2">
+          <DrawerClose asChild>
+            <Button variant="outline">Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+export default FeedbackForm;
+
+./ProgressBar.tsx:
+import React from 'react';
+
+interface ProgressBarProps {
+  current: number;
+  total: number;
+}
+
+const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
+  const percentage = (current / total) * 100;
+
+  return (
+    <div className="w-full bg-subtleBackground rounded-full p-1 shadow-md">
+      <div className="flex items-center">
+        <div 
+          className="bg-primary/80 h-2 rounded-full transition-all duration-300 ease-in-out" 
+          style={{ width: `${percentage}%` }}
+        ></div>
+        <span className="text-xs font-medium text-primary font-kameron ml-2">
+          {current} of {total}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default ProgressBar;
+
+./Question.tsx:
+import React from 'react';
+import { Button } from "@/components/ui/button";
+
+interface QuestionProps {
+  question: {
+    questionNumber: number;
+    questionText: string;
+    answerOptions: string[];
+    correctAnswerIndex: number;
+    hint: string;
+  };
+  onAnswer: (answerIndex: number) => void;
+  userAnswer?: number;
+  showExplanation: boolean;
+}
+
+const Question: React.FC<QuestionProps> = ({ question, onAnswer, userAnswer, showExplanation }) => {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold font-kameron text-primary/80">Question {question.questionNumber}</h2>
+      <p className="text-lg text-primary font-kameron">{question.questionText}</p>
+      <div className="space-y-2">
+        {question.answerOptions.map((option, index) => (
+          <Button
+          key={index}
+          onClick={() => onAnswer(index)}
+          disabled={showExplanation}
+          variant={showExplanation 
+            ? index === question.correctAnswerIndex 
+              ? "correct" 
+              : userAnswer === index 
+                ? "incorrect" 
+                : "muted"
+            : userAnswer === index 
+              ? "default" 
+              : "quiz"
+          }
+          className="w-full justify-start text-left"
+        >
+          {option}
+        </Button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Question;
+
+./QuestionReview.tsx:
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useCustomToast } from '@/components/ToasterProvider';
+
+interface QuestionReviewProps {
+  question: {
+    questionNumber: number;
+    questionText: string;
+    answerOptions: string[];
+    correctAnswer: string;
+    correctAnswerIndex: number;
+    hint: string;
+    explanation: string;
+  };
+  userAnswer: number;
+  onClose: () => void;
+}
+
+const QuestionReview: React.FC<QuestionReviewProps> = ({ question, userAnswer, onClose }) => {
+  const [feedback, setFeedback] = useState('');
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const showToast = useCustomToast();
+
+  const handleSubmitFeedback = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send the feedback to your backend
+    console.log('Feedback submitted for question', question.questionNumber, ':', feedback);
+    showToast('Feedback submitted successfully!', 'success');
+    setFeedback('');
+    setShowFeedbackForm(false);
+  };
+
+  return (
+    <Card className="w-full bg-subtleBackground mb-4">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-xl font-bold">Question {question.questionNumber}</CardTitle>
+        <Button onClick={onClose} variant="outline" size="sm">
+          Close
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="font-semibold">{question.questionText}</p>
+        
+        {question.answerOptions.map((option, index) => (
+          <div
+            key={index}
+            className={`p-2 rounded ${
+              index === question.correctAnswerIndex
+                ? 'bg-correct-med'
+                : index === userAnswer
+                ? 'bg-incorrect-med'
+                : 'bg-gray-200'
+            }`}
+          >
+            {option}
+          </div>
+        ))}
+        
+        <div className="mt-4">
+          <h3 className="font-semibold">Explanation:</h3>
+          <p>{question.explanation}</p>
+        </div>
+        
+        <div className="mt-4">
+          <h3 className="font-semibold">Hint:</h3>
+          <p>{question.hint}</p>
+        </div>
+        
+        {!showFeedbackForm ? (
+          <Button onClick={() => setShowFeedbackForm(true)} variant="outline">
+            Send Feedback
+          </Button>
+        ) : (
+          <form onSubmit={handleSubmitFeedback} className="space-y-2">
+            <Textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Enter your feedback for this question..."
+              className="w-full"
+            />
+            <div className="flex justify-end space-x-2">
+              <Button type="button" onClick={() => setShowFeedbackForm(false)} variant="outline">
+                Cancel
+              </Button>
+              <Button type="submit">
+                Submit Feedback
+              </Button>
+            </div>
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default QuestionReview;
+
+./QuizContainer.tsx:
+import React, { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Question from './Question';
+import ProgressBar from './ProgressBar';
+import Results from './Results';
+import Timer from './Timer';
+import { LightbulbIcon } from 'lucide-react';
+
+interface QuizData {
+  quizID: string;
+  subject: string;
+  questions: Array<{
+    questionNumber: number;
+    questionText: string;
+    answerOptions: string[];
+    correctAnswer: string;
+    correctAnswerIndex: number;
+    hint: string;
+    explanation: string;
+  }>;
+}
+
+interface QuizContainerProps {
+  quizData: QuizData;
+}
+
+const QuizContainer: React.FC<QuizContainerProps> = ({ quizData }) => {
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
+    const [userAnswers, setUserAnswers] = useState<number[]>([]);
+    const [correct, setCorrect] = useState<boolean[]>(new Array(quizData.questions.length).fill(false));
+    const [score, setScore] = useState(0);
+    const [quizCompleted, setQuizCompleted] = useState(false);
+    const [showExplanation, setShowExplanation] = useState(false);
+    const [quizStarted, setQuizStarted] = useState(false);
+    const [showHint, setShowHint] = useState(false);
+    const [hintClicked, setHintClicked] = useState<boolean[]>(new Array(quizData.questions.length).fill(false));
+    const [isAnswered, setIsAnswered] = useState(false);
+    const [timeUp, setTimeUp] = useState(false);
+    const [timerKey, setTimerKey] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(30); // New state to track time left
+
+    
+    const calculateQuestionScore = (answerIndex: number, timeRemaining: number) => {
+        const isCorrect = answerIndex === quizData.questions[currentQuestionIndex].correctAnswerIndex;
+        setCorrect(prevCorrect => {
+            const newCorrect = [...prevCorrect];
+            newCorrect[currentQuestionIndex] = isCorrect;
+            return newCorrect;
+        });
+
+
+        const hintWasUsed = hintClicked[currentQuestionIndex];
+        if (isCorrect) {
+            if (hintWasUsed) {
+                return 50;
+            } else {
+                return 100 + (timeRemaining * 2);
+            }
+        } else {
+            if (hintWasUsed) {
+                return -25;
+            } else {
+                return 0;
+            }
+        }
+    };
+  
+    const handleAnswer = (answerIndex: number) => {
+      if (isAnswered || timeUp) return;
+      setIsAnswered(true);
+      const newUserAnswers = [...userAnswers];
+      newUserAnswers[currentQuestionIndex] = answerIndex;
+      setUserAnswers(newUserAnswers);
+
+      const questionScore = calculateQuestionScore(answerIndex, timeLeft);
+      setScore(prevScore => prevScore + questionScore);
+      setShowExplanation(true);
+    };
+  
+    const handleNextQuestion = () => {
+      if (currentQuestionIndex < quizData.questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setShowExplanation(false);
+        setShowHint(false);
+        setIsAnswered(false);
+        setTimeUp(false);
+        setTimerKey(prevKey => prevKey + 1);
+      } else {
+        setQuizCompleted(true);
+      }
+    };
+  
+    const handleTimeUp = () => {
+      if (!isAnswered && !timeUp) {
+        setTimeUp(true);
+        const newUserAnswers = [...userAnswers];
+        newUserAnswers[currentQuestionIndex] = -1;
+        setUserAnswers(newUserAnswers);
+        setShowExplanation(true);
+        const questionScore = calculateQuestionScore(currentQuestionIndex, 0);
+        setScore(prevScore => prevScore + questionScore);
+      }
+    };
+
+
+  const startQuiz = () => {
+    setQuizStarted(true);
+    setCurrentQuestionIndex(0);
+  };
+
+  const toggleHint = () => {
+    if (!hintClicked[currentQuestionIndex]) {
+      const newHintClicked = [...hintClicked];
+      newHintClicked[currentQuestionIndex] = true;
+      setHintClicked(newHintClicked);
+      setShowHint(true);
+    }
+  };
+
+  if (quizCompleted) {
+    console.log(userAnswers, score, hintClicked);
+    console.log(correct)
+    return <Results score={score} quizData={quizData} userAnswers={userAnswers} />;
+}
+
+  const currentQuestion = quizData.questions[currentQuestionIndex];
+
+  return (
+    <div className="w-full max-w-6xl mx-auto min-h-[600px] flex flex-col">
+      <div className="mb-4">
+        <ProgressBar 
+          current={currentQuestionIndex + 1} 
+          total={quizData.questions.length} 
+        />
+      </div>
+      <Card className="w-full bg-subtleBackground shadow-lg flex-grow">
+        <CardContent className="p-6 h-full flex flex-col">
+          {!quizStarted ? (
+            <div className="text-center flex-grow flex flex-col justify-center">
+              <h2 className="text-2xl font-bold mb-4 text-textColor font-kameron">{quizData.subject}</h2>
+              <p className="mb-6 text-textColor font-kameron">
+                *You will be doing an AI-generated quiz, this quiz has been reviewed by professionals, but there may still be mistakes in the questions and/or answers. In the results section there's an opportunity to provide feedback on these questions
+              </p>
+              <Button onClick={startQuiz} className="bg-accentColor text-textColor hover:bg-accentColor/80 mx-auto">
+                Start the Quiz!
+              </Button>
+            </div>
+          ) : (
+            <div className="flex h-full">
+              <div className="w-2/3 pr-6 flex flex-col">
+                {currentQuestion ? (
+                  <Question
+                    question={currentQuestion}
+                    onAnswer={handleAnswer}
+                    userAnswer={userAnswers[currentQuestionIndex]}
+                    showExplanation={showExplanation}
+                  />
+                ) : (
+                  <div>Loading question...</div>
+                )}
+              </div>
+              <div className="w-1/3 pl-6 border-l border-secondaryColor flex flex-col">
+                <div className="mb-4">
+                  <Button 
+                    onClick={toggleHint}
+                    variant="hint"
+                    className="w-full text-primaryColor flex items-center justify-end border-primaryColor"
+                    disabled={hintClicked[currentQuestionIndex]}
+                  >
+                    <LightbulbIcon className="mr-2" size={18} />
+                    Hint
+                  </Button>
+                </div>
+                {showHint && currentQuestion && (
+                  <div className="mb-4 p-4 bg-hint/20 rounded-lg">
+                    <p className="text-primaryColor font-kameron">{currentQuestion.hint}</p>
+                  </div>
+                )}
+                <div className="flex-grow"></div>
+                {showExplanation && currentQuestion && (
+                  <div className={`mb-4 p-4 ${userAnswers[currentQuestionIndex] === currentQuestion.correctAnswerIndex 
+                        ? "bg-correct-med" : "bg-incorrect-med"} rounded-lg `}>
+                    <h3 className="font-semibold font-kameron text-center text-primaryColor">
+                      {userAnswers[currentQuestionIndex] === currentQuestion.correctAnswerIndex 
+                        ? "Correct!" : "Incorrect"}
+                    </h3>
+                    <p className="text-primaryColor font-kameron">{currentQuestion.explanation}</p>
+                  </div>
+                )}
+                <div className="mt-auto">
+                  <Button 
+                    onClick={handleNextQuestion} 
+                    disabled={!showExplanation}
+                    className="w-full bg-accentColor text-primaryColor/80 font-semibold hover:bg-accentColor/80"
+                  >
+                    {currentQuestionIndex < quizData.questions.length - 1 ? "Next Question >" : "Finish Quiz!"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      {quizStarted && currentQuestion && (
+      <div className="mb-4">
+      <Timer 
+                key={timerKey}
+                initialTime={30}
+                onTimeUp={handleTimeUp}
+                isAnswered={isAnswered || timeUp}
+                questionIndex={currentQuestionIndex}
+                onTimeChange={(time) => setTimeLeft(time)}
+              />
+  </div>
+    )}
+    </div>
+  );
+};
+
+export default QuizContainer;      
+
+./Results.tsx:
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import QuestionReview from './QuestionReview';
+
+interface QuizData {
+  quizID: string;
+  subject: string;
+  questions: Array<{
+    questionNumber: number;
+    questionText: string;
+    answerOptions: string[];
+    correctAnswer: string;
+    correctAnswerIndex: number;
+    hint: string;
+    explanation: string;
+  }>;
+}
+
+interface ResultsProps {
+  score: number;
+  quizData: QuizData;
+  userAnswers: number[];
+}
+
+const Results: React.FC<ResultsProps> = ({ score, quizData, userAnswers }) => {
+  const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
+
+  const handleQuestionClick = (questionNumber: number) => {
+    setSelectedQuestion(questionNumber);
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      <Card className="bg-subtleBackground mb-4">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Quiz Completed!</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-center">
+            <p className="text-4xl font-bold">Score: {score}</p>
+          </div>
+          
+          <div className="grid grid-cols-4 gap-2">
+            {quizData.questions.map((question, index) => (
+              <Button
+                key={question.questionNumber}
+                onClick={() => handleQuestionClick(index)}
+                className={`${userAnswers[index] === question.correctAnswerIndex ? 'bg-correct-med' : 'bg-incorrect-med'}`}
+              >
+                Question {question.questionNumber}
+              </Button>
+            ))}
+          </div>
+          
+          <Link href="/" passHref>
+            <Button className="w-auto flex justify-end">Return to Home</Button>
+          </Link>
+        </CardContent>
+      </Card>
+      
+      {selectedQuestion !== null && (
+        <QuestionReview
+          question={quizData.questions[selectedQuestion]}
+          userAnswer={userAnswers[selectedQuestion]}
+          onClose={() => setSelectedQuestion(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Results;
+
+./Timer.tsx:
+import React, { useState, useEffect } from 'react';
+
+interface TimerProps {
+  initialTime: number; // Time in seconds
+  onTimeUp: () => void;
+  isAnswered: boolean;
+  questionIndex: number; // Add this prop
+  onTimeChange: (time: number) => void;
+
+}
+
+const Timer: React.FC<TimerProps> = ({ initialTime, onTimeUp, isAnswered, questionIndex, onTimeChange }) => {
+  const [timeLeft, setTimeLeft] = useState(initialTime);
+
+  useEffect(() => {
+    setTimeLeft(initialTime); // Reset the timer when the question changes
+  }, [questionIndex, initialTime]);
+
+  useEffect(() => {
+    if (timeLeft <= 0 || isAnswered) {
+      if (timeLeft <= 0) {
+        onTimeUp();
+      }
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setTimeLeft(time => {
+        const newTime = time - 1;
+        onTimeChange(newTime); // Call this function to update the parent component
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [timeLeft, onTimeUp, isAnswered, onTimeChange]);
+
+  const percentage = (timeLeft / initialTime) * 100;
+
+  return (
+    <div className="w-full bg-subtleBackground rounded-full p-1 shadow-md mt-4">
+      <div className="flex items-center">
+        <div 
+          className="bg-accent/80 h-2 rounded-full transition-all duration-300 ease-in-out" 
+          style={{ width: `${percentage}%` }}
+        ></div>
+        <span className="text-xs font-medium text-primary font-kameron ml-2">
+          {Math.floor(timeLeft / 60).toString().padStart(2, '0')}:
+          {(timeLeft % 60).toString().padStart(2, '0')}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default Timer;
+

@@ -1,0 +1,1783 @@
+./dailymed/app/globals.css:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --header-height: 0px;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+./dailymed/app/layout.tsx:
+'use client';
+
+import '@/styles/globals.css'
+import Header from '@/components/header'
+import { Kameron } from 'next/font/google'
+import { SubjectsProvider } from '@/contexts/SubjectsContext'
+import SmoothScroll from '@/components/ui/SmoothScroll';
+
+const kameron = Kameron({ 
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-kameron',
+})
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={`${kameron.variable} bg-background`}>
+        <SmoothScroll />
+        <SubjectsProvider>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow mt-[var(--header-height)]">
+          {children}
+          </main>
+          <footer className="bg-primary text-white text-center py-4">
+            <p>&copy; 2024 DailyMed</p>
+          </footer>
+          </div>
+        </SubjectsProvider>
+      </body>
+    </html>
+  )
+}
+
+./dailymed/app/page.tsx:
+"use client";
+
+import React from 'react';
+import HeroSection from '@/components/HeroSection';
+import Container from '@/components/Container';
+import GradientSeparator from '@/components/GradientSeparator';
+import SubjectsSection from '@/components/SubjectSection';
+import AboutSection from '@/components/AboutSection';
+import WorkflowSection from '@/components/WorkflowSection';
+
+interface Subject {
+  name: string;
+  endpoint: string;
+  description: string;
+  subheading: string;
+  icon: string;
+  color: '';
+}
+interface MainPageProps {
+  subjects: Subject[];
+}
+
+const MainPage: React.FC<MainPageProps> = () => {
+  return (
+    <div>
+      <HeroSection />
+      <GradientSeparator />
+      <Container>
+        {/* Other page content */}
+        <SubjectsSection />
+        {/* More content */}
+      </Container>
+      <GradientSeparator />
+      <AboutSection id="about"/>
+      <GradientSeparator />
+      <WorkflowSection id="workflow"/>
+      <GradientSeparator className='h-8' />
+    </div>
+  );
+};
+
+export default MainPage;
+
+./dailymed/components/AboutSection.tsx:
+
+import React from 'react';
+import Container from './Container';
+
+
+const AboutSection: React.FC<{ id?: string }> = ({ id }) => {
+    return (
+      <section id={id} className="py-12">
+        <Container>
+        <img src="/logo.svg" alt="logo" className="h-24 w-24 mx-auto justify-center" />
+        <h2 className="text-3xl font-bold font-kameron text-primary/80 text-center mb-8">About</h2>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-5xl">
+        <p className="text-l text-gray-600 text-justify">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vestibulum fermentum mauris ut mattis. Integer vestibulum cursus interdum. Aenean iaculis est eu consequat ultrices. Praesent eleifend posuere sollicitudin. Phasellus a nunc eget lectus iaculis cursus in dapibus nisi. Etiam id purus dolor. Integer viverra lectus eget nisi viverra, non accumsan ligula efficitur. Donec efficitur enim pharetra mi dapibus, vitae convallis risus tempus. Ut viverra dui vel ante dictum, ultrices maximus mi laoreet. Sed fringilla dictum feugiat.
+        </p>        <p className="text-l text-gray-600 text-justify">In hac habitasse platea dictumst. Aliquam in metus tortor. In dapibus ultrices scelerisque. Proin laoreet odio et turpis mattis pulvinar. Etiam non risus maximus, laoreet dui non, pellentesque orci. Fusce quis nibh nec elit congue dignissim ac ut elit. Donec placerat, metus sed dapibus viverra, nibh massa semper justo, in commodo purus ante sed lacus. Maecenas at cursus ante, ac consequat urna. Praesent sed pellentesque neque, a ornare magna. Vestibulum posuere dolor eget arcu euismod tristique. Nunc tempus lorem et tortor pretium placerat.
+        </p>        <p className="text-l text-gray-600 text-justify">Nulla posuere eget lorem eu dapibus. Vestibulum nulla risus, blandit non pellentesque eget, ultricies a sem. Donec mattis ante lectus. In et iaculis leo, sit amet aliquet sapien. Vivamus sed elit non dolor consectetur suscipit. Phasellus mi arcu, venenatis a dolor vel, tincidunt luctus ex. In bibendum condimentum ipsum et sodales. Ut dapibus mi eros, vel porta sapien finibus non.
+        </p>        <p className="text-l text-gray-600 text-justify">Maecenas placerat tellus eget pulvinar feugiat. Praesent molestie magna a velit commodo, vitae eleifend massa consectetur. Quisque in ornare arcu. Vivamus dapibus magna nulla, nec maximus dolor semper iaculis. Nullam ut consectetur lorem, non semper ipsum. Proin et pharetra odio, id interdum eros. Donec eros augue, aliquam at magna in, cursus condimentum orci. Donec ultricies dui eleifend, maximus elit a, bibendum sem. Proin non nunc ut nunc euismod pellentesque. Nullam ut dignissim ante.
+        </p>
+</div>
+    </Container>
+         </section>
+ );
+};
+
+export default AboutSection;
+
+./dailymed/components/Authentication.tsx:
+import React, { useState, useEffect } from 'react'
+import { User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+// Custom useMediaQuery hook
+const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+    const listener = () => setMatches(media.matches)
+    media.addListener(listener)
+    return () => media.removeListener(listener)
+  }, [matches, query])
+
+  return matches
+}
+
+
+type LoginFormProps = {
+  className: string;
+  onRegisterClick: () => void;
+};
+
+const LoginForm = ({ className, onRegisterClick }: LoginFormProps) => {
+  return (
+    <form className={className}>
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input type="email" id="email" placeholder="Enter your email" />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="password">Password</Label>
+          <Input type="password" id="password" placeholder="Enter your password" />
+        </div>
+        <Button type="submit">Log in</Button>
+        <p className="text-sm text-center">
+          Not yet registered?{' '}
+          <button
+            type="button"
+            className="text-primary underline"
+            onClick={onRegisterClick}
+          >
+            Create an account
+          </button>
+        </p>
+      </div>
+    </form>
+  )
+}
+
+const RegisterForm = ({ className }: { className: string }) => {
+  return (
+    <form className={className}>
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="register-email">Email</Label>
+          <Input type="email" id="register-email" placeholder="Enter your email" />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" placeholder="Enter your name" />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="register-password">Password</Label>
+          <Input type="password" id="register-password" placeholder="Create a password" />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="confirm-password">Confirm Password</Label>
+          <Input type="password" id="confirm-password" placeholder="Confirm your password" />
+        </div>
+        <Button type="submit">Register</Button>
+      </div>
+    </form>
+  )
+}
+
+const LoginComponent = () => {
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [registerOpen, setRegisterOpen] = useState(false)
+  const isDesktop = useMediaQuery("(min-width: 768px)")
+
+  const handleRegisterClick = () => {
+    setLoginOpen(false)
+    setRegisterOpen(true)
+  }
+
+  const loginContent = (
+    <>
+      <DialogHeader>
+            <img src="/full-logo.svg" alt="DailyMed Logo" className="h-14 w-auto m-3 justify-center" />
+        <DialogTitle>Log in</DialogTitle>
+        <DialogDescription>
+          Enter your credentials to access your account.
+        </DialogDescription>
+      </DialogHeader>
+      <LoginForm className="py-4" onRegisterClick={handleRegisterClick} />
+    </>
+  )
+
+  const registerContent = (
+    <>
+      <DialogHeader>
+
+        <img src="/full-logo.svg" alt="DailyMed Logo" className="h-14 w-auto m-3 justify-center" />
+
+        <DialogTitle>Create an account</DialogTitle>
+        <DialogDescription>
+          Fill in the details below to create your account.
+        </DialogDescription>
+      </DialogHeader>
+      <RegisterForm className="py-4" />
+    </>
+  )
+
+  if (isDesktop) {
+    return (
+      <>
+        <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon" className="text-primary">
+              <User className="h-5 w-5" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            {loginContent}
+          </DialogContent>
+        </Dialog>
+        <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            {registerContent}
+          </DialogContent>
+        </Dialog>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Drawer open={loginOpen} onOpenChange={setLoginOpen}>
+        <DrawerTrigger asChild>
+          <Button variant="outline" size="icon" className="text-primary">
+            <User className="h-5 w-5" />
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader className="text-left">
+            <DrawerTitle>Log in</DrawerTitle>
+            <DrawerDescription>
+              Enter your credentials to access your account.
+            </DrawerDescription>
+          </DrawerHeader>
+          <LoginForm className="px-4" onRegisterClick={handleRegisterClick} />
+          <DrawerFooter className="pt-2">
+            <DrawerClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      <Drawer open={registerOpen} onOpenChange={setRegisterOpen}>
+        <DrawerContent>
+          <DrawerHeader className="text-left">
+            <DrawerTitle>Create an account</DrawerTitle>
+            <DrawerDescription>
+              Fill in the details below to create your account.
+            </DrawerDescription>
+          </DrawerHeader>
+          <RegisterForm className="px-4" />
+          <DrawerFooter className="pt-2">
+            <DrawerClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </>
+  )
+}
+
+const RegisterComponent = ({ trigger }: { trigger: React.ReactNode }) => {
+  const [open, setOpen] = useState(false)
+  const isDesktop = useMediaQuery("(min-width: 768px)")
+
+  const content = (
+    <>
+      <DialogHeader>
+      <img src="/full-logo.svg" alt="DailyMed Logo" className="h-14 w-auto m-3 justify-center" />
+
+        <DialogTitle>Create an account</DialogTitle>
+        <DialogDescription>
+          Fill in the details below to create your account.
+        </DialogDescription>
+      </DialogHeader>
+      <RegisterForm className="py-4" />
+    </>
+  )
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          {content}
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        {trigger}
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Create an account</DrawerTitle>
+          <DrawerDescription>
+            Fill in the details below to create your account.
+          </DrawerDescription>
+        </DrawerHeader>
+        <RegisterForm className="px-4" />
+        <DrawerFooter className="pt-2">
+          <DrawerClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+export { LoginComponent, RegisterComponent }
+
+./dailymed/components/Container.tsx:
+import React from 'react';
+
+interface ContainerProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const Container: React.FC<ContainerProps> = ({ children, className = '' }) => {
+  return (
+    <div className={`max-w-[70%] mx-auto ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+export default Container;
+
+./dailymed/components/GlowingBorder.tsx:
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
+
+interface GlowingBorderProps {
+  borderGradient?: string;
+  glowColor?: string;
+  animationDuration?: number;
+  borderWidth?: number;
+  borderRadius?: number;
+  className?: string;
+}
+
+const defaultGradient = 'linear-gradient(90deg, #DFE9ED 0%, #F1BA6D 25%, #57B5A6 50%, #16443C80 75%, #DFE9ED 100%)';
+
+const flowAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+`;
+
+const BorderContainer = styled.div<{
+  $borderGradient: string;
+  $glowColor: string;
+  $animationDuration: number;
+  $borderWidth: number;
+  $borderRadius: number;
+}>`
+  position: relative;
+  border-radius: ${props => props.$borderRadius}px;
+  transition: transform 0.3s ease;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -${props => props.$borderWidth}px;
+    border-radius: inherit;
+    background: ${props => props.$borderGradient};
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &::before {
+    z-index: -1;
+  }
+
+  &::after {
+    filter: blur(${props => props.$borderWidth * 2}px);
+    z-index: -2;
+  }
+
+  &:hover::before,
+  &:hover::after {
+    opacity: 1;
+    animation: ${flowAnimation} ${props => props.$animationDuration}s linear infinite;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const ContentContainer = styled.div`
+  position: relative;
+  z-index: 1;
+`;
+
+const GlowingBorder: React.FC<GlowingBorderProps & { children: React.ReactNode }> = ({
+  children,
+  borderGradient = defaultGradient,
+  glowColor,
+  animationDuration = 3,
+  borderWidth = 2,
+  borderRadius = 8,
+  className,
+}) => {
+  return (
+    <BorderContainer
+      $borderGradient={borderGradient}
+      $glowColor={glowColor || borderGradient}
+      $animationDuration={animationDuration}
+      $borderWidth={borderWidth}
+      $borderRadius={borderRadius}
+      className={className}
+    >
+      <ContentContainer>
+        {children}
+      </ContentContainer>
+    </BorderContainer>
+  );
+};
+
+export default GlowingBorder;
+
+./dailymed/components/GradientSeparator.tsx:
+import React from 'react';
+
+interface GradientSeparatorProps {
+  className?: string;
+}
+
+const GradientSeparator: React.FC<GradientSeparatorProps> = ({ className = '' }) => {
+  return (
+    <div 
+      className={`
+        h-1 
+        shadow-sm
+        bg-[linear-gradient(to_right,#DFE9ED_0%,#F1BA6D_25%,#57B5A6_50%,#16443C80_75%,#DDE8EC_100%)]
+        ${className}
+      `}
+    ></div>
+  );
+};
+
+export default GradientSeparator;
+
+./dailymed/components/header.tsx:
+import React, { useRef, useEffect } from 'react';
+import Link from 'next/link';
+import GradientSeparator from '@/components/GradientSeparator';
+import { User, Sun } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import NavigationMenu from '@/components/NavMenu';
+import { LoginComponent } from '@/components/Authentication';
+
+const Header = () => {
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      const height = headerRef.current.offsetHeight!;
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    }
+  }, []);
+
+  return (
+    <header ref={headerRef} className="bg-white opacity-90 fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        <Link href="/" passHref>
+          <div className="flex items-center space-x-2">
+            <img src="/full-logo.svg" alt="DailyMed Logo" className="h-14 w-auto m-3" />
+          </div>
+        </Link>
+        <nav className="flex items-center space-x-6">
+          <NavigationMenu />
+          <LoginComponent />
+          <Button variant="outline" size="icon" className="text-primary">
+            <Sun className="h-5 w-5" />
+          </Button>
+        </nav>
+      </div>
+      <GradientSeparator className="absolute bottom-0 left-0 right-0" />
+    </header>
+  );
+};
+
+export default Header;
+
+./dailymed/components/HeroSection.tsx:
+import React from 'react';
+import Container from './Container'; // Adjust the import path as needed
+import Link from 'next/link'; 
+import { RegisterComponent } from '@/components/Authentication'; // Adjust the import path as needed
+import { Button } from '@/components/ui/button'; // Adjust the import path as needed
+
+const HeroSection = () => {
+  return (
+    <section className="py-12">
+      <Container>
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="md:w-1/3 space-y-4">
+            <p className="text-sm font-semibold font-kameron text-primary uppercase">VERIFIED</p>
+            <h1 className="text-4xl font-bold font-kameron text-primary">
+              Medical Quizzes on Expert level
+            </h1>
+            <div className="flex flex-wrap space-x-5 pt-4 mr-5">
+              <Link href="/#about" legacyBehavior passHref scroll={false}> 
+              <button className="flex-none w-auto px-6 py-2 mt-5 bg-secondary/80 text-black rounded-full hover:bg-secondary/90 transition-colors">
+                How does it work?
+              </button>
+              </Link>
+              <RegisterComponent 
+              trigger={<Button className="flex-none w-auto px-6 py-2 mt-5 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors">Sign up now</Button>}
+              /> 
+            </div>
+          </div>
+          <div className="md:w-2/3 mt-8 md:mt-0">
+            <div className="bg-gray-200 w-auto h-128 flex items-center justify-center">
+              <img src="/placeholder_hero.webp" alt="Hero Image" className="h-128" />
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+};
+
+export default HeroSection;
+
+./dailymed/components/LoadingSpinner.tsx:
+import React from 'react';
+
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-50">
+    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
+export default LoadingSpinner;
+
+./dailymed/components/NavMenu.tsx:
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, NavigationMenuContent, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
+import { useSubjects } from '@/contexts/SubjectsContext';
+
+interface Subject {
+  name: string;
+  endpoint: string;
+}
+
+const NavMenu = () => {
+  const { subjects, isLoading } = useSubjects();
+
+  return (
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>
+              Quiz Subjects
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              {subjects.map(subject => (
+                <Link key={subject.name} href={subject.endpoint} legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    {subject.name}
+                  </NavigationMenuLink>
+                </Link>
+              ))}
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/#about" legacyBehavior passHref scroll={false}>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                About
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/#workflow" legacyBehavior passHref scroll={false}>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Workflow
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    );
+  };
+  
+  export default NavMenu;
+
+./dailymed/components/quiz/QuizSection.tsx:
+
+
+./dailymed/components/SubjectCard.tsx:
+import React from 'react';
+import styled from 'styled-components';
+import { Dna } from 'lucide-react';
+import Link from 'next/link';
+import GlowingBorder from './GlowingBorder';
+
+interface SubjectCardProps {
+  name: string;
+  endpoint: string;
+  subheading: string;
+  description: string;
+  color: string;
+  icon: string;
+}
+
+const CardWrapper = styled.div`
+  min-width: 300px;
+  width: 100%;
+  position: relative;
+`;
+
+const CardContent = styled.div<{ $color: string }>`
+  background-color: transparent;
+  padding: 32px;
+  border: 2px solid --primary/80;};
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const Title = styled.h3`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: 'Kameron', serif;
+  margin-bottom: 0.75rem;
+`;
+
+const Question = styled.p`
+  
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Kameron', serif;
+  margin-bottom: 0.75rem;
+`;
+
+const Description = styled.p`
+  
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--primary/80);
+  border-radius: 12px;
+  margin-top: auto;
+`;
+
+const SubjectCard: React.FC<SubjectCardProps> = ({ name, endpoint, subheading, description, color, icon }) => {
+  const IconComponent = Dna;
+
+  return (
+    <CardWrapper>
+      <GlowingBorder animationDuration={5} borderWidth={3} borderRadius={12}>
+        <CardContent $color={color}>
+          <Title>{name}</Title>
+          <Question>{subheading}</Question>
+          <Description>{description}</Description>
+          <IconWrapper>
+            <IconComponent size={40} />
+          </IconWrapper>
+        </CardContent>
+        <Link href={endpoint} legacyBehavior passHref>
+          <a aria-label={name} style={{ position: 'absolute', inset: 0 }} />
+        </Link>
+      </GlowingBorder>
+    </CardWrapper>
+  );
+};
+
+export default SubjectCard;
+
+./dailymed/components/SubjectSection.tsx:
+
+import React from 'react';
+import SubjectCard from './SubjectCard';
+import Container from './Container';
+import { useSubjects } from '@/contexts/SubjectsContext';
+import LoadingSpinner from './LoadingSpinner';
+
+
+
+const SubjectsSection = () => {
+  const { subjects, isLoading } = useSubjects();
+
+  if (subjects.length === 0) {
+    return (
+      <section className="py-12">
+        <Container>
+          <h2 className="text-3xl font-bold font-kameron text-center mb-8 text-primary/80">Subjects</h2>
+          <LoadingSpinner />
+        </Container>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-12">
+    <Container>
+      <h2 className="text-3xl font-bold font-kameron text-center mb-8 text-primary/80">Subjects</h2>
+      <div className="flex justify-center">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl">
+        {subjects.map((subject) => (
+          <SubjectCard key={subject.name} {...subject} />
+        ))}
+      </div>
+    </div>
+    </Container>
+  </section>
+  );
+};
+
+export default SubjectsSection;
+
+./dailymed/components/ui/button.tsx:
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        nav: "flex items-center space-x-1 text-primary/80 hover:text-primary font-kameron font-bold text-lg hover:underline transition-all duration-200"
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+
+./dailymed/components/ui/card.tsx:
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      className
+    )}
+    {...props}
+  />
+))
+Card.displayName = "Card"
+
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
+
+const CardTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "text-2xl font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
+
+const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
+
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
+
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+
+
+./dailymed/components/ui/dialog.tsx:
+"use client"
+
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+const Dialog = DialogPrimitive.Root
+
+const DialogTrigger = DialogPrimitive.Trigger
+
+const DialogPortal = DialogPrimitive.Portal
+
+const DialogClose = DialogPrimitive.Close
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
+
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col space-y-1.5 text-center sm:text-left font-kameron text-primary",
+      className
+    )}
+    {...props}
+  />
+)
+DialogHeader.displayName = "DialogHeader"
+
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    )}
+    {...props}
+  />
+)
+DialogFooter.displayName = "DialogFooter"
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight font-kameron text-primary",
+      className
+    )}
+    {...props}
+  />
+))
+DialogTitle.displayName = DialogPrimitive.Title.displayName
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+DialogDescription.displayName = DialogPrimitive.Description.displayName
+
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+}
+
+
+./dailymed/components/ui/drawer.tsx:
+"use client"
+
+import * as React from "react"
+import { Drawer as DrawerPrimitive } from "vaul"
+
+import { cn } from "@/lib/utils"
+
+const Drawer = ({
+  shouldScaleBackground = true,
+  ...props
+}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
+  <DrawerPrimitive.Root
+    shouldScaleBackground={shouldScaleBackground}
+    {...props}
+  />
+)
+Drawer.displayName = "Drawer"
+
+const DrawerTrigger = DrawerPrimitive.Trigger
+
+const DrawerPortal = DrawerPrimitive.Portal
+
+const DrawerClose = DrawerPrimitive.Close
+
+const DrawerOverlay = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Overlay
+    ref={ref}
+    className={cn("fixed inset-0 z-50 bg-black/80", className)}
+    {...props}
+  />
+))
+DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
+
+const DrawerContent = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DrawerPortal>
+    <DrawerOverlay />
+    <DrawerPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        className
+      )}
+      {...props}
+    >
+      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      {children}
+    </DrawerPrimitive.Content>
+  </DrawerPortal>
+))
+DrawerContent.displayName = "DrawerContent"
+
+const DrawerHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("grid gap-1.5 p-4 text-center sm:text-left font-kameron", className)}
+    {...props}
+  />
+)
+DrawerHeader.displayName = "DrawerHeader"
+
+const DrawerFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+    {...props}
+  />
+)
+DrawerFooter.displayName = "DrawerFooter"
+
+const DrawerTitle = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Title
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight font-kameron text-primary",
+      className
+    )}
+    {...props}
+  />
+))
+DrawerTitle.displayName = DrawerPrimitive.Title.displayName
+
+const DrawerDescription = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+DrawerDescription.displayName = DrawerPrimitive.Description.displayName
+
+export {
+  Drawer,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+}
+
+
+./dailymed/components/ui/input.tsx:
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
+
+export { Input }
+
+
+./dailymed/components/ui/label.tsx:
+"use client"
+
+import * as React from "react"
+import * as LabelPrimitive from "@radix-ui/react-label"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const labelVariants = cva(
+  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-kameron text-primary"
+)
+
+const Label = React.forwardRef<
+  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
+    VariantProps<typeof labelVariants>
+>(({ className, ...props }, ref) => (
+  <LabelPrimitive.Root
+    ref={ref}
+    className={cn(labelVariants(), className)}
+    {...props}
+  />
+))
+Label.displayName = LabelPrimitive.Root.displayName
+
+export { Label }
+
+
+./dailymed/components/ui/navigation-menu.tsx:
+import * as React from "react"
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
+import { cva } from "class-variance-authority"
+import { ChevronDown } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+const NavigationMenu = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
+  <NavigationMenuPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative z-10 flex max-w-max flex-1 items-center justify-center",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <NavigationMenuViewport />
+  </NavigationMenuPrimitive.Root>
+))
+NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+
+const NavigationMenuList = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.List
+    ref={ref}
+    className={cn(
+      "group flex flex-1 list-none items-center justify-center space-x-1",
+      className
+    )}
+    {...props}
+  />
+))
+NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
+
+const NavigationMenuItem = NavigationMenuPrimitive.Item
+
+const navigationMenuTriggerStyle = cva(
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-base font-semibold transition-colors hover:underline focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:underline data-[state=open]:underline font-kameron text-primary"
+)
+
+const NavigationMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <NavigationMenuPrimitive.Trigger
+    ref={ref}
+    className={cn(navigationMenuTriggerStyle(), "group", className)}
+    {...props}
+  >
+    {children}{" "}
+    <ChevronDown
+      className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
+      aria-hidden="true"
+    />
+  </NavigationMenuPrimitive.Trigger>
+))
+NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+
+const NavigationMenuContent = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Content
+    ref={ref}
+    className={cn(
+      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto ",
+      className
+    )}
+    {...props}
+  />
+))
+NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
+
+const NavigationMenuLink = NavigationMenuPrimitive.Link
+
+const NavigationMenuViewport = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
+>(({ className, ...props }, ref) => (
+  <div className={cn("absolute left-0 top-full flex justify-center")}>
+    <NavigationMenuPrimitive.Viewport
+      className={cn(
+        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  </div>
+))
+NavigationMenuViewport.displayName =
+  NavigationMenuPrimitive.Viewport.displayName
+
+const NavigationMenuIndicator = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Indicator
+    ref={ref}
+    className={cn(
+      "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
+      className
+    )}
+    {...props}
+  >
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+  </NavigationMenuPrimitive.Indicator>
+))
+NavigationMenuIndicator.displayName =
+  NavigationMenuPrimitive.Indicator.displayName
+
+export {
+  navigationMenuTriggerStyle,
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuContent,
+  NavigationMenuTrigger,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
+}
+
+./dailymed/components/ui/SmoothScroll.tsx:
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+const SmoothScroll = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+
+    const handleClick = (e: MouseEvent) => {
+      let target = e.target as HTMLElement;
+      
+      // Traverse up the DOM tree to find the nearest link
+      while (target && target !== document.body) {
+        if (target.tagName === 'A' || (target.tagName === 'BUTTON' && target.hasAttribute('href'))) {
+          const href = target.getAttribute('href');
+          if (href?.startsWith('#')) {
+            console.log('Link clicked:', href);
+            e.preventDefault();
+            const id = href.slice(1);
+            const element = document.getElementById(id);
+            if (element) {
+              const yOffset = -60; // Adjust this value as needed
+              const elementPosition = element.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset + yOffset;
+              
+              window.scrollBy({
+                top: elementPosition + yOffset,
+                behavior: 'smooth'
+              });
+            }
+          } else if (href?.startsWith('/') && href.includes('#')) {
+            // Handle internal links with hash
+            e.preventDefault();
+            const [path, hash] = href.split('#');
+            router.push(path);
+            setTimeout(() => {
+              const element = document.getElementById(hash);
+              if (element) {
+                const yOffset = -60; // Adjust this value as needed
+                const elementPosition = element.getBoundingClientRect().top;
+                
+                window.scrollBy({
+                  top: elementPosition + yOffset,
+                  behavior: 'smooth'
+                });
+              }
+            }, 100); // Small delay to ensure the new page has loaded
+          }
+          break;
+        }
+        target = target.parentElement as HTMLElement;
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+
+    return () => {
+      console.log('SmoothScroll component unmounted');
+      document.removeEventListener('click', handleClick);
+    };
+  }, [router]);
+
+  return null;
+};
+
+export default SmoothScroll;
+
+./dailymed/components/WorkflowSection.tsx:
+
+import React from 'react';
+import Container from './Container';
+
+
+const WorkflowSection: React.FC<{ id?: string }> = ({ id }) => {
+    return (
+      <section id={id} className="py-12">
+    <Container>
+      <h2 className="text-3xl font-bold font-kameron text-center text-primary/90 mb-8">Workflow</h2>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-5xl">
+        <p className="text-l text-gray-600 text-justify">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vestibulum fermentum mauris ut mattis. Integer vestibulum cursus interdum. Aenean iaculis est eu consequat ultrices. Praesent eleifend posuere sollicitudin. Phasellus a nunc eget lectus iaculis cursus in dapibus nisi. Etiam id purus dolor. Integer viverra lectus eget nisi viverra, non accumsan ligula efficitur. Donec efficitur enim pharetra mi dapibus, vitae convallis risus tempus. Ut viverra dui vel ante dictum, ultrices maximus mi laoreet. Sed fringilla dictum feugiat.
+        </p>        <p className="text-l text-gray-600 text-justify">In hac habitasse platea dictumst. Aliquam in metus tortor. In dapibus ultrices scelerisque. Proin laoreet odio et turpis mattis pulvinar. Etiam non risus maximus, laoreet dui non, pellentesque orci. Fusce quis nibh nec elit congue dignissim ac ut elit. Donec placerat, metus sed dapibus viverra, nibh massa semper justo, in commodo purus ante sed lacus. Maecenas at cursus ante, ac consequat urna. Praesent sed pellentesque neque, a ornare magna. Vestibulum posuere dolor eget arcu euismod tristique. Nunc tempus lorem et tortor pretium placerat.
+        </p>        <p className="text-l text-gray-600 text-justify">Nulla posuere eget lorem eu dapibus. Vestibulum nulla risus, blandit non pellentesque eget, ultricies a sem. Donec mattis ante lectus. In et iaculis leo, sit amet aliquet sapien. Vivamus sed elit non dolor consectetur suscipit. Phasellus mi arcu, venenatis a dolor vel, tincidunt luctus ex. In bibendum condimentum ipsum et sodales. Ut dapibus mi eros, vel porta sapien finibus non.
+        </p>        <p className="text-l text-gray-600 text-justify">Maecenas placerat tellus eget pulvinar feugiat. Praesent molestie magna a velit commodo, vitae eleifend massa consectetur. Quisque in ornare arcu. Vivamus dapibus magna nulla, nec maximus dolor semper iaculis. Nullam ut consectetur lorem, non semper ipsum. Proin et pharetra odio, id interdum eros. Donec eros augue, aliquam at magna in, cursus condimentum orci. Donec ultricies dui eleifend, maximus elit a, bibendum sem. Proin non nunc ut nunc euismod pellentesque. Nullam ut dignissim ante.
+        </p>
+</div>
+    </Container>
+  </section>
+  );
+};
+
+export default WorkflowSection;
+
+./dailymed/contexts/SubjectsContext.tsx:
+// contexts/SubjectsContext.tsx
+import React, { createContext, useState, useEffect, useContext } from 'react';
+
+interface Subject {
+    name: string;
+    endpoint: string;
+    description: string;
+    subheading: string;
+    icon: string;
+    color: '';
+  }
+
+interface SubjectsContextType {
+  subjects: Subject[];
+  isLoading: boolean;
+}
+
+const SubjectsContext = createContext<SubjectsContextType>({ subjects: [], isLoading: true });
+
+export const SubjectsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/init')
+      .then(response => response.json())
+      .then(data => {
+        setSubjects(data);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching subjects:', error);
+        setIsLoading(false);
+      });
+  }, []);
+
+  return (
+    <SubjectsContext.Provider value={{ subjects, isLoading }}>
+      {children}
+    </SubjectsContext.Provider>
+  );
+};
+
+export const useSubjects = () => useContext(SubjectsContext);
+
+./dailymed/lib/utils.ts:
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+
+./dailymed/next-env.d.ts:
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+
+
+./dailymed/styles/globals.css:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add any additional global styles here */
+@layer base {
+    :root {
+        --background: 195 35% 95%;
+        --foreground: 193 76% 8%;
+    
+        --primary: 179 90% 11%;
+        --primary-foreground: 0 0% 100%;
+     
+        --secondary: 176 46% 49%;
+        --secondary-foreground: 0 0% 100%;
+     
+        --accent: 35 86% 69%;
+        --accent-foreground: 193 76% 8%;
+     
+        --muted: 195 35% 85%;
+        --muted-foreground: 193 76% 30%;
+     
+        --card: 195 35% 95%;
+        --card-foreground: 193 76% 8%;
+     
+        --popover: 195 35% 95%;
+        --popover-foreground: 193 76% 8%;
+     
+        --border: 195 35% 85%;
+        --input: 195 35% 85%;
+        
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 100%;
+    
+        --ring: 176 46% 49%;
+        --header-height: 4rem;
+        --radius: 0.5rem;
+    }
+   
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+   
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+   
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+   
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+   
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+   
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+   
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+   
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+   
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 212.7 26.8% 83.9%;
+    }
+    .balanced-gradient {
+      background: linear-gradient(
+        to right,
+        hsl(var(--gradient-1)) 0%,
+        hsl(var(--gradient-2)) 25%,
+        hsl(var(--gradient-3) / 0.8) 50%,
+        hsl(var(--gradient-4)) 75%,
+        hsl(var(--gradient-5)) 100%
+      );
+      height: 1px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+./dailymed/tailwind.config.ts:
+import type { Config } from "tailwindcss"
+
+const config = {
+  darkMode: ["class"],
+  content: [
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+	],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      fontFamily: {
+        kameron: ['var(--font-kameron)'], // This uses the CSS variable we defined
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        teal: {
+          600: '#38A89D', // Adjust this color if needed to match your design
+        },
+        textColor: '#051C23',
+        backgroundColor: '#EDF5F8',
+        primaryColor: '#033937',
+        secondaryColor: '#43B6AF',
+        accentColor: '#F3B96C',
+        'gradient-1': '#DFE9ED',
+        'gradient-2': '#57B5A6',
+        'gradient-3': '#16443C',
+        'gradient-4': '#F1BA6D',
+        'gradient-5': '#DDE8EC',
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config
+
+export default config
+
